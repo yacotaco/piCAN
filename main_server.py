@@ -2,6 +2,8 @@ from flask import Flask
 from flask import render_template
 from flask import request
 from flask import redirect
+from flask import Response
+from server_helper_functions import generate_stream
 import IPs as ip
 import requests
 
@@ -57,6 +59,15 @@ def piCAN_90_ccw():
         try:
             r = requests.get(ip.do_90_ccw)
             return render_template("public/index.html", status_code=r.status_code)
+        except requests.exceptions.ConnectionError as e:
+            return render_template("public/index.html", status_code=503)
+
+@app.route('/camera', methods=['GET'])
+def piCAN_camera():
+    if request.method == 'GET':
+        try:
+            r = requests.get(ip.camera)
+            return Response(r, mimetype='multipart/x-mixed-replace; boundary=frame')
         except requests.exceptions.ConnectionError as e:
             return render_template("public/index.html", status_code=503)
 

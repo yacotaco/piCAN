@@ -1,6 +1,17 @@
 # helper functions
+
 from time import sleep 
 import RPi.GPIO as GPIO
+import cv2
+
+def generate_stream():
+    cap = cv2.VideoCapture(0)
+    if cap.isOpened() == True:
+        while True: 
+            ret, frame = cap.read() 
+            image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            retval, buffer = cv2.imencode('.jpg', image)
+            yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
 
 class Motor:
     def __init__(self):

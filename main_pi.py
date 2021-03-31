@@ -1,7 +1,8 @@
 from flask import Flask
 from flask import request
 from flask import jsonify
-from helper_functions import Motor
+from flask import Response
+from pi_helper_functions import Motor, generate_stream
 
 motor = Motor()
 app = Flask(__name__)
@@ -52,6 +53,14 @@ def piCAN_90_counter_clockwise():
             motor.do_90_counter_clockwise()
             data = {'operation_type': '90_counter_clockwise'}
             return jsonify(data), 200
+        except:
+            raise SystemExit(0)
+
+@app.route('/pi_camera', methods=['GET'])
+def piCAN_camera():
+    if request.method == 'GET':
+        try:
+            return Response(generate_stream(), mimetype='multipart/x-mixed-replace; boundary=frame')
         except:
             raise SystemExit(0)
 
